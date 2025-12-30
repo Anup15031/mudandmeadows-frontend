@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone } from "lucide-react";
@@ -8,7 +8,7 @@ import { useNavigation } from "@/hooks/useApi";
 import { apiClient } from "@/lib/api-client";
 import { useToast } from '@/hooks/use-toast';
 
-export function Header() {
+const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -355,3 +355,5 @@ export function Header() {
     </header>
   );
 }
+
+export default Header;

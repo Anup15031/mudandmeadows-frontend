@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import Header from "./Header";
+import Footer from "./Footer";
 import CartDrawer from "@/components/ui/CartDrawer";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";

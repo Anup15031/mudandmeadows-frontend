@@ -1,4 +1,3 @@
-
 import React, { Suspense } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Helmet } from "react-helmet-async";
@@ -8,7 +7,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 const HeroSection = React.lazy(() => import("@/components/home/HeroSection").then(mod => ({ default: mod.HeroSection })));
 const ExperiencesSection = React.lazy(() => import("@/components/home/ExperiencesSection").then(mod => ({ default: mod.ExperiencesSection })));
 const CottagesSection = React.lazy(() => import("@/components/home/CottagesSection").then(mod => ({ default: mod.CottagesSection })));
-const RoomsSection = React.lazy(() => import("@/components/home/RoomsSection").then(mod => ({ default: mod.RoomsSection })));
 const AboutSection = React.lazy(() => import("@/components/home/AboutSection").then(mod => ({ default: mod.AboutSection })));
 const SeasonalOfferSection = React.lazy(() => import("@/components/home/SeasonalOfferSection").then(mod => ({ default: mod.SeasonalOfferSection })));
 const TestimonialsSection = React.lazy(() => import("@/components/home/TestimonialsSection").then(mod => ({ default: mod.TestimonialsSection })));

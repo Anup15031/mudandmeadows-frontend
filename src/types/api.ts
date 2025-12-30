@@ -1,3 +1,11 @@
+// Review type for testimonials/reviews
+export interface Review {
+  _id?: string;
+  reviewer: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
 // API Response Types
 export interface Accommodation {
   id?: string;

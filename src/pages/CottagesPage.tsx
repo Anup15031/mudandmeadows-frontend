@@ -12,6 +12,7 @@ import CottageDetailModal from "@/components/cottages/CottageDetailModal";
 const CottagesPage = () => {
   const [openCottageId, setOpenCottageId] = useState<string | null>(null);
   const { data: cottages, loading, error, refetch } = useCottages();
+  const navigate = useNavigate();
 
   return (
     <Layout>
@@ -48,6 +49,19 @@ const CottagesPage = () => {
             <CottageDetailModal
               id={openCottageId}
               onClose={() => setOpenCottageId(null)}
+              onBook={(id, extraBedId, extraBedQty, adults, children) => {
+                // SPA navigation to booking with pre-selected cottage, guests, and optional extra bed
+                const params = new URLSearchParams();
+                params.set('cottage', String(id));
+                if (extraBedId) {
+                  params.set('extraBedId', String(extraBedId));
+                  params.set('extraBedQty', String(extraBedQty || 1));
+                }
+                if (typeof adults !== 'undefined') params.set('adults', String(adults));
+                if (typeof children !== 'undefined') params.set('children', String(children));
+                const q = `?${params.toString()}`;
+                navigate(`/booking${q}`);
+              }}
             />
           )}
         </div>

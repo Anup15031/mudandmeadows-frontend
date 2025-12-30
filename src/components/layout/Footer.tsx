@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
 
 function Footer(/* props */) {
   // read global config early if provided by backend script
@@ -21,6 +22,27 @@ function Footer(/* props */) {
   const email = info?.email || '';
   const description = info?.description || '';
   const awards = Array.isArray(info?.awards) ? info.awards : [];
+  const exploreLinks = Array.isArray(info?.footer?.explore)
+    ? info.footer.explore
+    : [
+        { name: 'Cottages', href: '/rooms' },
+        { name: 'Wellness Programs', href: '/programs/wellness' },
+        { name: 'Spa Treatments', href: '/programs/wellness' },
+        { name: 'Dining', href: '/dining' },
+        { name: 'Gallery', href: '/gallery' },
+      ];
+  const wellnessLinks = Array.isArray(info?.footer?.wellness)
+    ? info.footer.wellness
+    : [
+        { name: 'Ayurveda', href: '/wellness' },
+        { name: 'Yoga & Meditation', href: '/wellness' },
+        { name: 'Spa Therapies', href: '/wellness' },
+        { name: 'Detox Programs', href: '/wellness' },
+        { name: 'Sound Healing', href: '/wellness' },
+      ];
+  const contact = info?.footer?.contact || {};
+  const location = contact.location || info?.location || '';
+  const social = info?.footer?.social || {};
 
   return (
     <footer className="bg-foreground text-primary-foreground">
@@ -42,7 +64,7 @@ function Footer(/* props */) {
           <div>
             <h4 className="font-serif text-lg mb-6">Explore</h4>
             <ul className="space-y-3">
-              {[{ name: 'Cottages', href: '/rooms' },{ name: 'Wellness Programs', href: '/programs/wellness' },{ name: 'Spa Treatments', href: '/programs/wellness' },{ name: 'Dining', href: '/dining' },{ name: 'Gallery', href: '/gallery' }].map((link) => (
+              {exploreLinks.map((link: any) => (
                 <li key={link.name}><Link to={link.href} className="text-sm opacity-80 hover:opacity-100 transition-opacity">{link.name}</Link></li>
               ))}
             </ul>
@@ -51,8 +73,8 @@ function Footer(/* props */) {
           <div>
             <h4 className="font-serif text-lg mb-6">Wellness</h4>
             <ul className="space-y-3">
-              {["Ayurveda","Yoga & Meditation","Spa Therapies","Detox Programs","Sound Healing"].map((item) => (
-                <li key={item}><Link to="/wellness" className="text-sm opacity-80 hover:opacity-100 transition-opacity">{item}</Link></li>
+              {wellnessLinks.map((item: any) => (
+                <li key={item.name || item}><Link to={item.href || '/wellness'} className="text-sm opacity-80 hover:opacity-100 transition-opacity">{item.name || item}</Link></li>
               ))}
             </ul>
           </div>
@@ -60,7 +82,7 @@ function Footer(/* props */) {
           <div>
             <h4 className="font-serif text-lg mb-6">Contact</h4>
             <ul className="space-y-4">
-              <li className="flex gap-3"><MapPin className="h-5 w-5 opacity-70 flex-shrink-0 mt-0.5" /><span className="text-sm opacity-80">{info?.location || ''}</span></li>
+              <li className="flex gap-3"><MapPin className="h-5 w-5 opacity-70 flex-shrink-0 mt-0.5" /><span className="text-sm opacity-80">{location}</span></li>
               <li className="flex gap-3"><Phone className="h-5 w-5 opacity-70 flex-shrink-0" /><a href={`tel:${phone}`} className="text-sm opacity-80 hover:opacity-100 transition-opacity">{phone}</a></li>
               <li className="flex gap-3"><Mail className="h-5 w-5 opacity-70 flex-shrink-0" /><a href={`mailto:${email}`} className="text-sm opacity-80 hover:opacity-100 transition-opacity">{email}</a></li>
             </ul>
@@ -88,4 +110,4 @@ function Footer(/* props */) {
   );
 }
 
-export { Footer };
+export default Footer;

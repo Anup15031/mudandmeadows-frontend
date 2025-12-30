@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiClient } from "@/lib/api-client";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/layout/Header";
 import { useNavigate } from "react-router-dom";
 
 const heroImage = "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80";

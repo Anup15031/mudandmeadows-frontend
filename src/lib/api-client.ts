@@ -1,9 +1,3 @@
-// API Client Configuration
-// Use Vite's import.meta.env in browser builds instead of Node's process.env
-// Default to backend root (no `/api` prefix) for local dev. Use VITE_API_URL or NEXT_PUBLIC_API_URL to override.
-// Prefer explicit VITE_API_URL / NEXT_PUBLIC_API_URL if provided.
-// Otherwise, when running locally on localhost, default to http://localhost:8000 so frontend
-// dev server at localhost:3000 can reach backend at :8000 without a proxy configured.
 const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? 'http://localhost:8000' : '');
 const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.NEXT_PUBLIC_API_KEY || '';
 
@@ -114,15 +108,20 @@ export class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    // Normalize endpoint to avoid duplicate `/api` when baseUrl already contains `/api`
+    // Always use exactly one /api prefix, never /api/api
     let endpointPath = endpoint;
-    if (this.baseUrl && this.baseUrl.endsWith('/api') && endpointPath.startsWith('/api')) {
-      endpointPath = endpointPath.replace(/^\/api/, '');
+    // Remove duplicate /api if present at the start of endpoint and end of baseUrl
+    if (
+      this.baseUrl &&
+      this.baseUrl.replace(/\/+$/, '').endsWith('/api') &&
+      endpointPath.replace(/^\/+/, '').startsWith('api/')
+    ) {
+      endpointPath = endpointPath.replace(/^\/?api\//, '/');
     }
     // Ensure endpoint path starts with '/'
     if (!endpointPath.startsWith('/')) endpointPath = '/' + endpointPath;
     // Join and collapse duplicate slashes but preserve protocol (http://)
-    const url = `${this.baseUrl}${endpointPath}`.replace(/([^:\/])\/\/+/g, '$1/');
+    const url = `${this.baseUrl.replace(/\/+$/, '')}${endpointPath}`.replace(/([^:])\/\/+/g, '$1/');
 
     const defaultHeaders: HeadersInit = {
       'Content-Type': 'application/json',
@@ -388,7 +387,7 @@ export class ApiClient {
   }
 
   async getBooking(id: string) {
-    return this.request(`/bookings/${id}`);
+    return this.request(`/api/bookings/${id}`);
   }
 
   async createBooking(data: any) {
@@ -610,7 +609,8 @@ export class ApiClient {
     if (category) qs.push(`category=${encodeURIComponent(category)}`);
     if (visibleOnly) qs.push(`visible=true`);
     const query = qs.length ? `?${qs.join('&')}` : '';
-    return this.request(`/gallery/${query}`);
+    // FIX: Remove trailing slash before query to match /api/gallery?visible=true
+    return this.request(`/api/gallery${query}`);
   }
 
   async createGalleryItem(data: any) {
@@ -636,6 +636,19 @@ export class ApiClient {
   // Health check
   async healthCheck() {
     return this.request('/health');
+  }
+
+  async createContactMessage(data: {
+    name: string;
+    email: string;
+    phone?: string;
+    subject: string;
+    message: string;
+  }) {
+    return this.request('/api/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 }
 

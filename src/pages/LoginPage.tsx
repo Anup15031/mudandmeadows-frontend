@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api-client';
 import { useToast } from '@/hooks/use-toast';
+import { Star } from 'lucide-react'; // Optional: for star icons
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -18,6 +19,8 @@ export default function LoginPage() {
   const [checkOut, setCheckOut] = useState('');
   const [availableCottages, setAvailableCottages] = useState<any[]>([]);
   const [cottagesLoading, setCottagesLoading] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -146,6 +149,15 @@ export default function LoginPage() {
     }
   }, [checkIn, checkOut]);
 
+  // Fetch reviews from backend
+  useEffect(() => {
+    setReviewsLoading(true);
+    fetch('/api/reviews')
+      .then(res => res.json())
+      .then(setReviews)
+      .finally(() => setReviewsLoading(false));
+  }, []);
+
   return (
     <div className="max-w-md mx-auto p-6">
       <h2 className="text-2xl font-serif mb-4">{mode === 'login' ? 'Sign in' : 'Create account'}</h2>
@@ -222,6 +234,38 @@ export default function LoginPage() {
                 ))}
               </ul>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* --- Guest Reviews Section --- */}
+      <div className="mt-16">
+        <div className="text-center mb-6">
+          <div className="text-xs tracking-widest text-yellow-700 mb-2">GUEST EXPERIENCES</div>
+          <h2 className="text-3xl font-serif font-bold mb-2">Words from Our Guests</h2>
+        </div>
+        {reviewsLoading ? (
+          <div className="text-center">Loading reviews...</div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            {reviews.map((r) => (
+              <div
+                key={r.id}
+                className="bg-white rounded-lg shadow p-5 border border-gray-100"
+                style={{ maxWidth: 500, margin: "0 auto" }}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="font-semibold text-lg">{r.name}</div>
+                  <div className="flex items-center ml-auto">
+                    {[...Array(r.rating)].map((_, i) => (
+                      <Star key={i} size={16} className="text-yellow-500 fill-yellow-400" />
+                    ))}
+                  </div>
+                </div>
+                <div className="italic text-gray-700 mb-2">"{r.review}"</div>
+                <div className="text-xs text-gray-400">{new Date(r.date).toLocaleDateString()}</div>
+              </div>
+            ))}
           </div>
         )}
       </div>

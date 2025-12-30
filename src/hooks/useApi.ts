@@ -1,3 +1,9 @@
+// Fetch all reviews
+import type { Review } from "@/types/api";
+
+export function useReviews() {
+  return useApi<Review[]>(() => apiClient.getReviews(), []);
+}
 import { useState, useEffect } from 'react';
 import { ApiError } from '@/types/api';
 import { apiClient } from '@/lib/api-client';

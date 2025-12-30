@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useHomePageData } from "@/hooks/useApi";
+import { useReviews } from "@/hooks/useApi";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,8 +7,8 @@ export function TestimonialsSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  const { data } = useHomePageData();
-  const testimonials = Array.isArray(data?.testimonials) ? data!.testimonials : [];
+  const { data: reviews, loading } = useReviews();
+  const testimonials = Array.isArray(reviews) ? reviews : [];
 
   useEffect(() => {
     if (!isAutoPlaying || testimonials.length === 0) return;
@@ -50,9 +50,13 @@ export function TestimonialsSection() {
 
           {/* Testimonial Content */}
           <div className="text-center pt-8">
-            {testimonials.map((testimonial, index) => (
+            {loading ? (
+              <div className="text-center py-8">Loading reviews...</div>
+            ) : testimonials.length === 0 ? (
+              <div className="text-center py-8">No reviews yet.</div>
+            ) : testimonials.map((review, index) => (
               <div
-                key={testimonial.id}
+                key={review._id || index}
                 className={cn(
                   "transition-all duration-500",
                   index === activeIndex
@@ -62,7 +66,7 @@ export function TestimonialsSection() {
               >
                 {/* Stars */}
                 <div className="flex justify-center gap-1 mb-6">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
+                  {Array.from({ length: review.rating }).map((_, i) => (
                     <Star
                       key={i}
                       className="h-5 w-5 fill-primary text-primary"
@@ -72,14 +76,14 @@ export function TestimonialsSection() {
 
                 {/* Quote */}
                 <blockquote className="font-serif text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed mb-8 max-w-3xl mx-auto">
-                  "{testimonial.content}"
+                  "{review.comment}"
                 </blockquote>
 
                 {/* Author */}
                 <div>
-                  <p className="font-medium text-lg">{testimonial.name}</p>
+                  <p className="font-medium text-lg">{review.reviewer}</p>
                   <p className="text-muted-foreground text-sm">
-                    {testimonial.location}
+                    {review.date ? new Date(review.date).toLocaleDateString() : ""}
                   </p>
                 </div>
               </div>

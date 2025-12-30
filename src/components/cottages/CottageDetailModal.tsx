@@ -64,19 +64,7 @@ function ExtraBeddingSection({ cottage, onSelectForBooking }: { cottage: any, on
               <span className="text-sm">{b.name || b.title || b.label} – ₹{b.pricePerNight || b.price || b.amount || '0'} / night</span>
             </label>
           ))}
-          <div className="flex items-center gap-3 mt-2">
-            <label className="inline-flex items-center gap-2">
-              <input type="checkbox" checked={includeInBooking} onChange={(e) => setIncludeInBooking(e.target.checked)} />
-              <span className="text-sm">Add to booking</span>
-            </label>
-            <label className="text-sm text-muted-foreground">Quantity</label>
-            <select value={qty} onChange={(e) => setQty(Number(e.target.value))} className="p-1 rounded border">
-              {Array.from({ length: Math.max(1, (availableFromCottage || 1)) }).map((_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
-              ))}
-            </select>
-            <Button onClick={handleRequest} disabled={isLoading}>{isLoading ? 'Requesting…' : 'Request Extra Bed'}</Button>
-          </div>
+          {/* Removed Add to booking and Quantity UI */}
         </fieldset>
       ) : (
         <div className="space-y-2">
@@ -95,7 +83,7 @@ function ExtraBeddingSection({ cottage, onSelectForBooking }: { cottage: any, on
             { (cottage.extra_bedding_price || cottage.extraBeddingPrice) && (
               <span className="text-sm">₹{cottage.extra_bedding_price || cottage.extraBeddingPrice} / night</span>
             ) }
-            <Button onClick={handleRequest} disabled={isLoading}>{isLoading ? 'Requesting…' : 'Request Extra Bed'}</Button>
+            {/* Removed Request Extra Bed button */}
           </div>
         </div>
       )}

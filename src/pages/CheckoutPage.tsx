@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/layout/Header";
 import { apiClient } from "@/lib/api-client";
 
 function formatINR(n: number) {
@@ -119,7 +119,7 @@ const CheckoutPage = () => {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
-            // --- Create booking and redirect with bookingId ---
+            // --- Create booking and redirect with bookingId in query string ---
             const booking = await apiClient.createApiBooking({
               guest_name: name,
               guest_email: email,
@@ -137,8 +137,12 @@ const CheckoutPage = () => {
               total_price: total,
               payment_method: paymentMethod,
             });
-            // Redirect to success page with bookingId in query string
-            navigate(`/booking/success?bookingId=${booking.id || booking._id}`);
+            // Wait a few seconds before redirecting to success page
+            setLoading(true);
+            setTimeout(() => {
+              setLoading(false);
+              navigate(`/booking/success?bookingId=${booking.id || booking._id}`);
+            }, 3000); // 3 seconds delay
           } catch (err: any) {
             setErrorMsg(
               err?.detail && typeof err.detail === "string"
@@ -172,13 +176,19 @@ const CheckoutPage = () => {
   return (
     <div style={{ background: "#f5f5f5", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
       <Header />
+      {/* Add margin to push content below header */}
+      <div style={{ height: 80 }} />
       <div style={{
         maxWidth: 1100,
-        margin: "40px auto",
+        margin: "0 auto",
+        background: "#fff",
+        borderRadius: 18,
+        boxShadow: "0 8px 32px #0002",
+        padding: 40,
+        position: "relative",
+        zIndex: 2,
         display: "flex",
-        gap: 32,
-        alignItems: "flex-start",
-        flexWrap: "wrap",
+        gap: 40,
       }}>
         {/* Left: Booker Details Form */}
         <form style={{ flex: 2, minWidth: 340 }} onSubmit={handlePayNow}>
