@@ -650,6 +650,11 @@ export class ApiClient {
       body: JSON.stringify(data),
     });
   }
+
+  // Reviews: fetch all reviews
+  async getReviews() {
+    return this.request('/api/reviews');
+  }
 }
 
 // Export singleton instance

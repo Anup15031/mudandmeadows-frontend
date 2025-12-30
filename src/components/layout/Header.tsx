@@ -75,33 +75,44 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Make header background more solid and add shadow for better separation
+  // At the very top of the homepage, make header fully transparent
   const headerBg = isScrolled || !isHomePage
-    ? "bg-background/95 backdrop-blur-md border-b border-border shadow-soft"
+    ? "bg-white/95 backdrop-blur-md"
     : "bg-transparent";
 
+  // Always ensure nav text is readable
   const textColor = isScrolled || !isHomePage
-    ? "text-foreground"
-    : "text-white";
+    ? "text-gray-900"
+    : "text-white drop-shadow-md";
 
   const logoColor = isScrolled || !isHomePage
     ? "text-primary"
-    : "text-white";
+    : "text-white drop-shadow-md";
 
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        isHomePage && !isScrolled
+          ? "absolute top-0 left-0 right-0 w-full z-50 transition-all duration-500"
+          : "fixed top-0 left-0 right-0 w-full z-50 transition-all duration-500",
         headerBg
       )}
       role="banner"
+      style={{
+        marginTop: 0,
+        paddingTop: 0,
+        top: 0,
+        boxShadow: 'none',
+      }}
     >
       {/* Top bar */}
       <div
             className={cn(
-              "hidden md:flex items-center justify-end gap-6 px-8 py-2 text-xs transition-all duration-500",
+              "hidden md:flex items-center justify-end gap-6 px-8 text-xs transition-all duration-500",
               isScrolled || !isHomePage
                 ? "bg-muted/50 text-muted-foreground"
-                : "bg-foreground/10 text-primary-foreground/80"
+                : "bg-transparent text-white"
             )}
           >
             <a
@@ -116,7 +127,9 @@ const Header: React.FC = () => {
       </div>
 
       {/* Main navigation */}
-      <nav aria-label="Primary navigation" className="container-padding flex items-center justify-between h-20">
+      <nav aria-label="Primary navigation" className={cn(
+        "container-padding flex items-center justify-between h-20 max-w-7xl mx-auto transition-all duration-500 pt-0 pb-0",
+      )}>
         {/* Logo */}
         <Link to="/" className="flex flex-col" title="Go to home page">
           <span
@@ -139,7 +152,7 @@ const Header: React.FC = () => {
         </Link>
 
         {/* Desktop Navigation - centered */}
-        <div className="hidden md:flex flex-1 items-center justify-center gap-8">
+        <div className="hidden md:flex flex-1 items-center justify-center gap-10">
           {regularNavItems.map((item: any) => {
             // Render Programs as a dropdown — click to open, with delayed close to allow clicking
             if ((item.label || item.name).toLowerCase() === "programs") {
@@ -198,7 +211,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Action Buttons (Book Now + Dynamic Buttons) */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-6 ml-8">
           {buttonNavItems.map((item: any) => (
             <Link 
               key={item.id || item.label}
@@ -264,11 +277,7 @@ const Header: React.FC = () => {
                 </div>
               )}
             </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <Link to="/login" className="text-sm">Sign in</Link>
-            </div>
-          )}
+          ) : null}
         </div>
 
         {/* Mobile Menu Button */}
@@ -346,9 +355,7 @@ const Header: React.FC = () => {
                 <Link to="/my-bookings" onClick={() => setIsMobileMenuOpen(false)} className="block py-2">My Bookings</Link>
                 <button onClick={() => { try { localStorage.removeItem('auth_token'); } catch(e){}; setUser(null); setIsMobileMenuOpen(false); toast({ title: 'Signed out', description: 'You have been signed out.' }); navigate('/'); }} className="block py-2">Logout</button>
               </div>
-            ) : (
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="block py-2">Sign in</Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

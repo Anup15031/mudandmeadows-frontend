@@ -1,7 +1,8 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Helmet } from "react-helmet-async";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { apiClient } from "@/lib/api-client";
 
 // Lazy-load sections to catch module-level import errors and show visible fallbacks
 const HeroSection = React.lazy(() => import("@/components/home/HeroSection").then(mod => ({ default: mod.HeroSection })));
@@ -16,6 +17,25 @@ const TestimonialsSection = React.lazy(() => import("@/components/home/Testimoni
  * are shown inline and won't crash the entire page.
  */
 const Index = () => {
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    setReviewsLoading(true);
+    apiClient.getReviews()
+      .then((data) => {
+        if (mounted) setReviews(data);
+      })
+      .catch(() => {
+        if (mounted) setReviews([]);
+      })
+      .finally(() => {
+        if (mounted) setReviewsLoading(false);
+      });
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <Layout>
       <Helmet>
@@ -32,10 +52,7 @@ const Index = () => {
         </ErrorBoundary>
       </Suspense>
 
-
-
       {/* RoomsSection removed as requested */}
-
 
       <Suspense fallback={<div style={{padding:20}}>Loading Cottages...</div>}>
         <ErrorBoundary name="CottagesSection">
@@ -65,7 +82,7 @@ const Index = () => {
 
       <Suspense fallback={<div style={{padding:20}}>Loading Testimonials...</div>}>
         <ErrorBoundary name="TestimonialsSection">
-          <TestimonialsSection />
+          <TestimonialsSection reviews={reviews} loading={reviewsLoading} />
         </ErrorBoundary>
       </Suspense>
     </Layout>

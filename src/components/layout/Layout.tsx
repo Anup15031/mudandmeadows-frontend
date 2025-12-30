@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import CartDrawer from "@/components/ui/CartDrawer";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 interface LayoutProps {
@@ -10,11 +10,15 @@ interface LayoutProps {
   showStickyBooking?: boolean;
 }
 
-export function Layout({ children, showStickyBooking = true }: LayoutProps) {
+export const Layout = ({ children, showStickyBooking = true }: LayoutProps) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className={`min-h-screen flex flex-col ${isHomePage ? "bg-transparent" : "bg-[#f8f6f2]"}`}>
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        {children}
+      </main>
       <Footer />
       <CartDrawer />
       {/* Sticky Book Now - Mobile Only */}

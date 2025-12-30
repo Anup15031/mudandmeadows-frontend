@@ -68,14 +68,15 @@ const App = () => {
   useEffect(() => {
     // ensure document/root visible and default styles so nothing is hidden by CSS
     try {
-      document.documentElement.style.background = "#fafafa";
-      document.body.style.background = "#fafafa";
-      document.body.style.color = "#111";
-      document.body.style.margin = "0";
+      // Remove forced background and margin styles to allow header/hero to reach top edge
+      document.documentElement.style.background = "";
+      document.body.style.background = "";
+      document.body.style.color = "";
+      document.body.style.margin = "";
       const root = document.getElementById("root") || document.getElementById("app") || null;
       if (root) {
-        (root as HTMLElement).style.display = "block";
-        (root as HTMLElement).style.minHeight = "100vh";
+        (root as HTMLElement).style.display = "";
+        (root as HTMLElement).style.minHeight = "";
       }
     } catch (e) {
       // ignore
