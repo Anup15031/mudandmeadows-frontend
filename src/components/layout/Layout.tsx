@@ -10,7 +10,7 @@ interface LayoutProps {
   showStickyBooking?: boolean;
 }
 
-export const Layout = ({ children, showStickyBooking = true }: LayoutProps) => {
+const Layout = ({ children, showStickyBooking = true }: LayoutProps) => {
   const location = useLocation();
   const isHomePage = location.pathname === "/";
   return (
@@ -34,3 +34,4 @@ export const Layout = ({ children, showStickyBooking = true }: LayoutProps) => {
     </div>
   );
 }
+export default Layout;

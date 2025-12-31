@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useProgramsActivities } from "@/hooks/useApi";
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { useNavigate } from "react-router-dom";

@@ -59,10 +59,10 @@ function ExtraBeddingSection({ cottage, onSelectForBooking }: { cottage: any, on
         <fieldset className="space-y-2">
           <legend className="sr-only">Optional Extra Bedding</legend>
           {filteredBeds.map((b: any) => (
-            <label key={b.id || b._id} className="flex items-center gap-3">
-              <input type="radio" name="extraBed" value={b.id || b._id} checked={String(selectedBedId) === String(b.id || b._id)} onChange={() => setSelectedBedId(String(b.id || b._id))} />
+            <div key={b.id || b._id} className="flex items-center gap-3 opacity-70">
+              {/* <input type="radio" ... /> removed to make non-selectable */}
               <span className="text-sm">{b.name || b.title || b.label} – ₹{b.pricePerNight || b.price || b.amount || '0'} / night</span>
-            </label>
+            </div>
           ))}
           {/* Removed Add to booking and Quantity UI */}
         </fieldset>

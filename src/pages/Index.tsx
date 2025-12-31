@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import { Helmet } from "react-helmet-async";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { apiClient } from "@/lib/api-client";

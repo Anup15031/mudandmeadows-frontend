@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useProgramsWellness, useCottage } from "@/hooks/useApi";
 import { Users, Maximize, Eye, Check, ArrowLeft, Calendar, Wifi, Coffee, Bath, Wind, Leaf } from "lucide-react";
@@ -63,59 +63,88 @@ const CottageDetailPage = () => {
 
   return (
     <Layout>
-      <section className="relative pt-24 pb-12 bg-warm">
-        <div className="container-padding max-w-5xl mx-auto">
-          <Button variant="outline" size="sm" className="mb-4" onClick={() => window.history.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Cottages
-          </Button>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <OptimizedImage
-                src={cottageObj.images && cottageObj.images.length > 0 ? cottageObj.images[0] : suiteImage}
-                alt={cottageObj.name}
-                className="w-full h-auto rounded-lg shadow"
-              />
+      <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-[#f8f6f2] via-[#f3ede3] to-[#e9e3d1] py-16 px-2">
+        <div className="w-full max-w-4xl mx-auto rounded-3xl bg-white/80 shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fadein">
+          <div className="md:w-1/2 flex items-center justify-center bg-gradient-to-br from-[#f5e9d6] to-[#f8f6f2] p-8">
+            <OptimizedImage
+              src={cottageObj.images && cottageObj.images.length > 0 ? cottageObj.images[0] : suiteImage}
+              alt={cottageObj.name}
+              className="w-full h-[340px] object-cover rounded-2xl shadow-xl transition-transform duration-700 hover:scale-105 animate-fadein"
+              style={{ maxWidth: 420 }}
+            />
+          </div>
+          <div className="md:w-1/2 flex flex-col justify-center p-8 gap-4">
+            <h1 className="font-serif text-4xl font-bold mb-2 tracking-tight text-[#b08643] animate-fadein-slow">{cottageObj.name}</h1>
+            <p className="text-lg text-gray-700 mb-2 animate-fadein-slow">{cottageObj.shortDescription}</p>
+            <div className="flex flex-wrap items-center gap-4 mb-2 animate-fadein-slow">
+              <span className="flex items-center gap-1 text-base text-gray-500"><Maximize className="h-5 w-5" /> {cottageObj.size} sqm</span>
+              <span className="flex items-center gap-1 text-base text-gray-500"><Users className="h-5 w-5" /> {cottageObj.capacity} guests</span>
+              <span className="flex items-center gap-1 text-base text-gray-500"><Eye className="h-5 w-5" /> {cottageObj.view}</span>
             </div>
-            <div>
-              <h1 className="font-serif text-3xl font-medium mb-2">{cottageObj.name}</h1>
-              <p className="text-muted-foreground mb-4">{cottageObj.shortDescription}</p>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="flex items-center gap-1 text-sm"><Maximize className="h-4 w-4" /> {cottageObj.size} sqm</span>
-                <span className="flex items-center gap-1 text-sm"><Users className="h-4 w-4" /> {cottageObj.capacity} guests</span>
-                <span className="flex items-center gap-1 text-sm"><Eye className="h-4 w-4" /> {cottageObj.view}</span>
+            <div className="mb-4 animate-fadein-slow">
+              <span className="font-serif text-3xl text-gradient-gold font-bold drop-shadow-glow">₹{cottageObj.price_per_night}</span>
+              <span className="text-muted-foreground text-lg"> / night</span>
+            </div>
+            <div className="mt-4 animate-fadein-slow">
+              <h2 className="font-serif text-xl mb-3 text-[#b08643] tracking-wide">Amenities</h2>
+              <div className="flex flex-wrap gap-3">
+                {cottageObj.amenities && cottageObj.amenities.length > 0 ? (
+                  cottageObj.amenities.map((amenity: string) => {
+                    const Icon = amenityIcons[amenity] || amenityIcons.default;
+                    return (
+                      <div
+                        key={amenity}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#f8f6f2] shadow-soft text-gray-700 text-base font-medium animate-fadein"
+                        style={{ minWidth: 140 }}
+                      >
+                        <Icon className="h-5 w-5 text-[#b08643]" />
+                        <span>{amenity}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <span className="text-muted-foreground">No amenities listed.</span>
+                )}
               </div>
-              <div className="mb-4">
-                <span className="font-serif text-2xl text-primary">₹{cottageObj.price_per_night}</span>
-                <span className="text-muted-foreground text-sm"> / night</span>
-              </div>
-              <Button variant="luxury" size="lg" onClick={() => {
-                // Go to booking page with this cottage pre-selected
+            </div>
+            <Button
+              variant="luxury"
+              size="lg"
+              className="mt-6 px-8 py-3 text-lg shadow-glow hover:scale-105 transition-transform duration-300 animate-fadein-slow"
+              onClick={() => {
                 window.location.href = `/booking?cottage=${encodeURIComponent(cottageObj.id)}`;
-              }}>
-                Book This Cottage
-              </Button>
-            </div>
+              }}
+            >
+              Book This Cottage
+            </Button>
           </div>
         </div>
       </section>
-      <section className="container-padding max-w-5xl mx-auto py-8">
-        <h2 className="font-serif text-2xl mb-4">Amenities</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {cottageObj.amenities && cottageObj.amenities.length > 0 ? (
-            cottageObj.amenities.map((amenity: string) => {
-              const Icon = amenityIcons[amenity] || amenityIcons.default;
-              return (
-                <div key={amenity} className="flex items-center gap-2 text-muted-foreground">
-                  <Icon className="h-5 w-5" />
-                  <span>{amenity}</span>
-                </div>
-              );
-            })
-          ) : (
-            <span className="text-muted-foreground">No amenities listed.</span>
-          )}
-        </div>
-      </section>
+      <style>{`
+        .text-gradient-gold {
+          background: linear-gradient(90deg, #b08643 0%, #e5c990 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-fill-color: transparent;
+        }
+        .drop-shadow-glow {
+          filter: drop-shadow(0 2px 8px #e5c99088);
+        }
+        .shadow-glow {
+          box-shadow: 0 4px 32px #e5c99033, 0 1.5px 8px #b0864340;
+        }
+        .animate-fadein {
+          animation: fadein 1.1s cubic-bezier(.4,2,.3,1);
+        }
+        .animate-fadein-slow {
+          animation: fadein 1.8s cubic-bezier(.4,2,.3,1);
+        }
+        @keyframes fadein {
+          from { opacity: 0; transform: translateY(32px) scale(0.98); }
+          to { opacity: 1; transform: none; }
+        }
+      `}</style>
     </Layout>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { usePackages } from "@/hooks/useApi";

@@ -17,10 +17,10 @@ function Footer(/* props */) {
     }
   }, [info]);
 
-  const title = info?.name || 'Resort';
-  const phone = info?.phone || '';
-  const email = info?.email || '';
-  const description = info?.description || '';
+  const title = info?.siteName || info?.name || 'Resort';
+  const phone = info?.contact?.reservations || info?.phone || '';
+  const email = info?.contact?.email || info?.email || '';
+  const description = info?.about?.description || info?.description || '';
   const awards = Array.isArray(info?.awards) ? info.awards : [];
   const exploreLinks = Array.isArray(info?.footer?.explore)
     ? info.footer.explore
@@ -41,8 +41,8 @@ function Footer(/* props */) {
         { name: 'Sound Healing', href: '/wellness' },
       ];
   const contact = info?.footer?.contact || {};
-  const location = contact.location || info?.location || '';
-  const social = info?.footer?.social || {};
+  const location = info?.contact?.location || contact.location || info?.location || '';
+  const social = info?.social || info?.footer?.social || {};
 
   return (
     <footer className="bg-foreground text-primary-foreground">
@@ -55,9 +55,15 @@ function Footer(/* props */) {
             </div>
             <p className="text-sm opacity-80 leading-relaxed">{description}</p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full border border-primary-foreground/30 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors"><Instagram className="h-4 w-4" /></a>
-              <a href="#" className="w-10 h-10 rounded-full border border-primary-foreground/30 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors"><Facebook className="h-4 w-4" /></a>
-              <a href="#" className="w-10 h-10 rounded-full border border-primary-foreground/30 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors"><Twitter className="h-4 w-4" /></a>
+              {social?.instagram && (
+                <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-primary-foreground/30 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors"><Instagram className="h-4 w-4" /></a>
+              )}
+              {social?.facebook && (
+                <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-primary-foreground/30 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors"><Facebook className="h-4 w-4" /></a>
+              )}
+              {social?.twitter && (
+                <a href={social.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-primary-foreground/30 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors"><Twitter className="h-4 w-4" /></a>
+              )}
             </div>
           </div>
 

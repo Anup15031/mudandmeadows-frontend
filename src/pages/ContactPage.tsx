@@ -1,4 +1,4 @@
-import { Layout } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useSiteConfig } from "@/hooks/useApi";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";

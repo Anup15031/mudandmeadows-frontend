@@ -183,7 +183,7 @@ const Header: React.FC = () => {
                       onMouseLeave={() => scheduleClosePrograms(1000)}
                     >
                       <Link to="/programs/wellness" className="block px-4 py-2 text-sm hover:bg-muted" title="Wellness Programs">Wellness Programs</Link>
-                      <Link to="/programs/activities" className="block px-4 py-2 text-sm hover:bg-muted" title="Resort Activities">Resort Activities</Link>
+                      {/* Removed Resort Activities link */}
                     </div>
                   )}
                 </div>
@@ -310,7 +310,7 @@ const Header: React.FC = () => {
                 <div key={item.id || item.name} className="space-y-1">
                   <div className="block py-3 text-lg font-serif tracking-wide">{item.label || item.name}</div>
                   <Link to="/programs/wellness" onClick={() => setIsMobileMenuOpen(false)} className="block pl-4 py-2 text-base">Wellness Programs</Link>
-                  <Link to="/programs/activities" onClick={() => setIsMobileMenuOpen(false)} className="block pl-4 py-2 text-base">Resort Activities</Link>
+                  {/* Removed Resort Activities link */}
                 </div>
               );
             }

@@ -1,4 +1,14 @@
 import React, { Suspense, useEffect, useState } from "react";
+const AdminLayout = React.lazy(() => import("./pages/admin/AdminLayout"));
+const AdminDashboard = React.lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminGallery = React.lazy(() => import("./pages/admin/AdminGallery"));
+const AdminBookings = React.lazy(() => import("./pages/admin/AdminBookings"));
+const AdminDining = React.lazy(() => import("./pages/admin/AdminDining"));
+const AdminBilling = React.lazy(() => import("./pages/admin/AdminBilling"));
+const AdminSite = React.lazy(() => import("./pages/admin/AdminSite"));
+const AdminWellness = React.lazy(() => import("./pages/admin/AdminWellness"));
+const AdminExperiences = React.lazy(() => import("./pages/admin/AdminExperiences"));
+const AdminBookWellness = React.lazy(() => import("./pages/admin/AdminBookWellness"));
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,7 +21,9 @@ const Index = React.lazy(() => import("./pages/Index"));
 const CottagesPage = React.lazy(() => import("./pages/CottagesPage"));
 const CottageDetailPage = React.lazy(() => import("./pages/CottageDetailPage"));
 const ProgramsWellnessPage = React.lazy(() => import("./pages/ProgramsWellnessPage"));
-const ProgramsActivitiesPage = React.lazy(() => import("./pages/ProgramsActivitiesPage"));
+const ProgramWellnessDetailPage = React.lazy(() => import("./pages/ProgramWellnessDetailPage"));
+const ProgramBookingPage = React.lazy(() => import("./pages/ProgramBookingPage"));
+// REMOVED: Activities page import
 const DiningPage = React.lazy(() => import("./pages/DiningPage"));
 const BookingPage = React.lazy(() => import("./pages/BookingPage"));
 const LoginPage = React.lazy(() => import("./pages/LoginPage"));
@@ -152,6 +164,18 @@ const App = () => {
             }>
               <Router>
                 <Routes>
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="gallery" element={<AdminGallery />} />
+                    <Route path="bookings" element={<AdminBookings />} />
+                    <Route path="dining" element={<AdminDining />} />
+                    <Route path="billing" element={<AdminBilling />} />
+                    <Route path="site" element={<AdminSite />} />
+                    <Route path="wellness" element={<AdminWellness />} />
+                    <Route path="experiences" element={<AdminExperiences />} />
+                    <Route path="book-wellness" element={<AdminBookWellness />} />
+                  </Route>
+                  {/* Removed invalid const declarations from inside JSX/routes. All React.lazy admin imports are now at the top of the file. */}
                   <Route path="/" element={<Index />} />
                   <Route path="/cottages" element={<CottagesPage />} />
                   <Route path="/cottages/:id" element={<CottageDetailPage />} />
@@ -159,11 +183,13 @@ const App = () => {
                   <Route path="/rooms" element={<Navigate to="/cottages" replace />} />
                   <Route path="/rooms/:id" element={<Navigate to="/cottages/:id" replace />} />
                   <Route path="/programs/wellness" element={<ProgramsWellnessPage />} />
-                  <Route path="/programs/activities" element={<ProgramsActivitiesPage />} />
+                  <Route path="/programs/wellness/:id" element={<ProgramWellnessDetailPage />} />
+                  {/* REMOVED: Activities page route */}
                   <Route path="/dining" element={<DiningPage />} />
                   <Route path="/gallery" element={<GalleryPage />} />
                   <Route path="/packages" element={<PackagesPage />} />
                   <Route path="/booking" element={<BookingPage />} />
+                  <Route path="/booking/program" element={<ProgramBookingPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/auth/complete" element={<AuthComplete />} />
                   <Route path="/my-bookings" element={<MyBookingsPage />} />

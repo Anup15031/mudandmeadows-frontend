@@ -9,6 +9,8 @@ function formatINR(n) {
 	return n.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 }
 
+import { useLocation } from "react-router-dom";
+
 const BookingPage = () => {
 		// Payment/booking state
 		const [loadingPayment, setLoadingPayment] = useState(false);
@@ -96,11 +98,20 @@ const BookingPage = () => {
 				setLoadingPayment(false);
 			}
 		};
+
 	const [allCottages, setAllCottages] = useState<any[]>([]);
 	const [cottages, setCottages] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [soldOutCottages, setSoldOutCottages] = useState<any[]>([]);
+
+	const location = useLocation();
+	const params = new URLSearchParams(location.search);
+	const initialCottageId = params.get('cottage');
+	const initialExtraBedId = params.get('extraBedId');
+	const initialExtraBedQty = params.get('extraBedQty');
+	const initialAdults = params.get('adults');
+	const initialChildren = params.get('children');
 
 	// Set default check-in to today and check-out to tomorrow
 	const today = new Date();
@@ -109,13 +120,33 @@ const BookingPage = () => {
 	const formatDate = (d) => d.toISOString().slice(0, 10);
 	const [checkIn, setCheckIn] = useState(formatDate(today));
 	const [checkOut, setCheckOut] = useState(formatDate(tomorrow));
-	const [adults, setAdults] = useState(2);
-	const [children, setChildren] = useState(0);
+	const [adults, setAdults] = useState(Number(initialAdults) || 2);
+	const [children, setChildren] = useState(Number(initialChildren) || 0);
 	const [numCottages, setNumCottages] = useState(1);
 	const [roomSelectorOpen, setRoomSelectorOpen] = useState(false);
-	// selectedCottages: [{cottage, extraBed, adults, children}]
-	const [selectedCottages, setSelectedCottages] = useState([]);
+	const [selectedCottages, setSelectedCottages] = useState<any[]>([]);
+	const [didInitFromQuery, setDidInitFromQuery] = useState(false);
 	const navigate = useNavigate();
+
+	// Pre-populate selectedCottages if query params exist and cottages are loaded
+	useEffect(() => {
+		if (initialCottageId && allCottages.length > 0) {
+			const found = allCottages.find(c => String(c.id) === String(initialCottageId));
+			if (found) {
+				setSelectedCottages([
+					{
+						cottage: found,
+						extraBed: !!initialExtraBedId,
+						extraBedId: initialExtraBedId || null,
+						extraBedQty: Number(initialExtraBedQty) || 1,
+						adults: Number(initialAdults) || 2,
+						children: Number(initialChildren) || 0,
+					},
+				]);
+			}
+		}
+		// eslint-disable-next-line
+	}, [allCottages.length, initialCottageId, initialExtraBedId, initialExtraBedQty, initialAdults, initialChildren]);
 
 	// Fetch all cottages (regardless of availability) once
 	useEffect(() => {
@@ -173,7 +204,14 @@ const BookingPage = () => {
 	    nights = Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
 	  }
 	}
-	const price = selectedCottages.reduce((sum, sc) => sum + ((sc.cottage.price_per_night || sc.cottage.price || 10000) * nights) + (sc.extraBed ? 1500 * nights : 0), 0);
+	const price = selectedCottages.reduce((sum, sc) => {
+		const base = (sc.cottage.price_per_night || sc.cottage.price || 10000) * nights;
+		// Use extraBedQty if present, else fallback to boolean
+		const extraBedCount = sc.extraBedQty ? Number(sc.extraBedQty) : (sc.extraBed ? 1 : 0);
+		// TODO: Use actual extra bed price if available per cottage/bed type
+		const extraBedPrice = 1500 * nights * extraBedCount;
+		return sum + base + extraBedPrice;
+	}, 0);
 	const gst = Math.round(price * 0.12);
 	const total = price + gst;
 
@@ -192,18 +230,19 @@ const BookingPage = () => {
 
 	// When numCottages changes, adjust selectedCottages array length
 	React.useEffect(() => {
-		if (!Array.isArray(cottages) || cottages.length === 0) return;
-		// Auto-select cottages up to numCottages, but preserve user's manual changes
-		let currentIds = selectedCottages.map(sc => sc.cottage.id);
-		let needed = numCottages - selectedCottages.length;
-		if (needed > 0) {
-			// Add unselected cottages in order
-			const available = cottages.filter(c => !currentIds.includes(c.id));
-			const newCottages = available.slice(0, needed).map(cottage => ({ cottage, extraBed: false, adults: 2, children: 0 }));
-			setSelectedCottages(prev => [...prev, ...newCottages]);
-		} else if (needed < 0) {
-			// Remove from end
-			setSelectedCottages(prev => prev.slice(0, numCottages));
+		if (!didInitFromQuery && initialCottageId && allCottages.length > 0) {
+			// Auto-select cottages up to numCottages, but preserve user's manual changes
+			let currentIds = selectedCottages.map(sc => sc.cottage.id);
+			let needed = numCottages - selectedCottages.length;
+			if (needed > 0) {
+				// Add unselected cottages in order
+				const available = cottages.filter(c => !currentIds.includes(c.id));
+				const newCottages = available.slice(0, needed).map(cottage => ({ cottage, extraBed: false, adults: 2, children: 0 }));
+				setSelectedCottages(prev => [...prev, ...newCottages]);
+			} else if (needed < 0) {
+				// Remove from end
+				setSelectedCottages(prev => prev.slice(0, numCottages));
+			}
 		}
 	}, [numCottages, cottages]);
 
@@ -453,9 +492,16 @@ const BookingPage = () => {
 															</div>
 														</div>
 													</div>
-													<div style={{ textAlign: 'center', marginTop: 4 }}>
-														{selectedCottages[selectedIdx].extraBed && <span style={{ color: '#b08643', fontSize: 14 }}>+Extra Bed</span>}
-													</div>
+																										<div style={{ textAlign: 'center', marginTop: 4 }}>
+																												{selectedCottages[selectedIdx].extraBed && (
+																													<span style={{ color: '#b08643', fontSize: 14 }}>
+																														+Extra Bed
+																														{selectedCottages[selectedIdx].extraBedQty && selectedCottages[selectedIdx].extraBedQty > 1
+																															? ` x${selectedCottages[selectedIdx].extraBedQty}`
+																															: ''}
+																													</span>
+																												)}
+																										</div>
 												</div>
 											)}
 										</div>
@@ -555,7 +601,7 @@ const BookingPage = () => {
 						   <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
 							 {selectedCottages.map((sc) => (
 							   <li key={sc.cottage.id} style={{ marginBottom: 4 }}>
-								 {sc.cottage.name || sc.cottage.title} {sc.extraBed && <span style={{ color: '#b08643', fontSize: 13 }}>(+Extra Bedding)</span>}
+								 {sc.cottage.name || sc.cottage.title} {sc.extraBed && <span style={{ color: '#b08643', fontSize: 13 }}>(+Extra Bedding{sc.extraBedQty && sc.extraBedQty > 1 ? ` x${sc.extraBedQty}` : ''})</span>}
 							   </li>
 							 ))}
 						   </ul>
