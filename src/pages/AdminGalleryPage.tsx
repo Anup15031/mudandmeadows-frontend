@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { GalleryImage, sampleCategories } from "../types/gallery";
 import hero from "../assets/hero-resort.jpg";
@@ -10,6 +11,9 @@ const STORAGE_KEY = "local_gallery_items";
 const AdminGalleryPage: React.FC = () => {
   const [items, setItems] = useState<GalleryImage[]>([]);
   const [form, setForm] = useState<Partial<GalleryImage>>({ imageUrl: hero, caption: "", category: "rooms", isVisible: true });
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -18,7 +22,6 @@ const AdminGalleryPage: React.FC = () => {
         setItems(JSON.parse(raw));
       } catch {}
     } else {
-      // Do NOT seed default gallery items — leave empty so UI reflects backend/localStorage only
       setItems([]);
     }
   }, []);
@@ -27,27 +30,41 @@ const AdminGalleryPage: React.FC = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const save = () => {
-    const id = form.id || Math.random().toString(36).slice(2, 9);
-    const next: GalleryImage = {
-      id,
-      imageUrl: form.imageUrl || hero,
-      caption: form.caption || "",
-      category: (form.category as any) || "rooms",
-      isVisible: form.isVisible !== false,
-      createdAt: form.createdAt || new Date().toISOString(),
-    };
-    setItems(prev => {
-      const exists = prev.find(p => p.id === id);
-      if (exists) return prev.map(p => (p.id === id ? next : p));
-      return [next, ...prev];
-    });
-    setForm({ imageUrl: hero, caption: "", category: "rooms", isVisible: true });
+  const save = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      if (file) {
+        formData.append("file", file);
+      } else if (form.imageUrl) {
+        formData.append("imageUrl", form.imageUrl);
+      }
+      if (form.caption) formData.append("caption", form.caption);
+      if (form.category) formData.append("category", form.category);
+      formData.append("isVisible", String(form.isVisible !== false));
+
+      const res = await fetch("/api/gallery/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Failed to create gallery item");
+      const data = await res.json();
+      setItems(prev => [data, ...prev]);
+      setForm({ imageUrl: hero, caption: "", category: "rooms", isVisible: true });
+      setFile(null);
+    } catch (err: any) {
+      setError(err.message || "Unknown error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // handle file input -> data URL for preview/upload (local dev)
+
+  // handle file input for upload and preview
   const onFile = (f?: File) => {
     if (!f) return;
+    setFile(f);
     const reader = new FileReader();
     reader.onload = () => {
       setForm(prev => ({ ...prev, imageUrl: String(reader.result) }));
@@ -73,6 +90,7 @@ const AdminGalleryPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-1 bg-white p-4 rounded shadow">
           <label className="block text-sm font-medium text-gray-700">Image URL</label>
+
           <input value={form.imageUrl || ""} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))} className="mt-1 block w-full border rounded px-2 py-1" />
           <label className="block text-sm font-medium text-gray-700 mt-3">Or upload</label>
           <input type="file" accept="image/*" onChange={e => onFile(e.target.files?.[0])} className="mt-1 block w-full" />
@@ -96,9 +114,10 @@ const AdminGalleryPage: React.FC = () => {
           </label>
 
           <div className="mt-4 flex gap-2">
-            <button onClick={save} className="px-3 py-1 bg-black text-white rounded">Save</button>
-            <button onClick={() => setForm({ imageUrl: hero, caption: "", category: "rooms", isVisible: true })} className="px-3 py-1 border rounded">Reset</button>
+            <button onClick={save} className="px-3 py-1 bg-black text-white rounded" disabled={loading}>{loading ? "Saving..." : "Save"}</button>
+            <button onClick={() => { setForm({ imageUrl: hero, caption: "", category: "rooms", isVisible: true }); setFile(null); }} className="px-3 py-1 border rounded">Reset</button>
           </div>
+          {error && <div className="text-red-600 mt-2">{error}</div>}
         </div>
 
         <div className="lg:col-span-2">

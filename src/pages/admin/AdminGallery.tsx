@@ -11,6 +11,17 @@ export default function AdminGallery() {
   const [caption, setCaption] = useState("");
   const [category, setCategory] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Manual add state
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manual, setManual] = useState({
+    title: "",
+    caption: "",
+    description: "",
+    type: "",
+    category: "",
+    url: "",
+    visible: true,
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -122,6 +133,54 @@ export default function AdminGallery() {
         </button>
       </form>
 
+      <button
+        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        onClick={() => setShowManualForm((v) => !v)}
+      >
+        {showManualForm ? "Cancel Manual Add" : "Add New (Manual)"}
+      </button>
+
+      {showManualForm && (
+        <form
+          className="mb-8 p-4 border rounded bg-gray-50 flex flex-col gap-2 max-w-xl"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setUploading(true);
+            setError(null);
+            try {
+              const res = await fetch("/api/gallery/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(manual),
+              });
+              if (!res.ok) throw new Error("Failed to add gallery card");
+              const newItem = await res.json();
+              setGallery([newItem, ...gallery]);
+              setManual({ title: "", caption: "", description: "", type: "", category: "", url: "", visible: true });
+              setShowManualForm(false);
+            } catch (err: any) {
+              setError(err.message || "Unknown error");
+            } finally {
+              setUploading(false);
+            }
+          }}
+        >
+          <input type="text" placeholder="Title" value={manual.title} onChange={e => setManual(m => ({ ...m, title: e.target.value }))} className="border rounded px-2 py-1" required />
+          <input type="text" placeholder="Caption" value={manual.caption} onChange={e => setManual(m => ({ ...m, caption: e.target.value }))} className="border rounded px-2 py-1" />
+          <textarea placeholder="Description" value={manual.description} onChange={e => setManual(m => ({ ...m, description: e.target.value }))} className="border rounded px-2 py-1" />
+          <input type="text" placeholder="Type (photo/video)" value={manual.type} onChange={e => setManual(m => ({ ...m, type: e.target.value }))} className="border rounded px-2 py-1" />
+          <input type="text" placeholder="Category" value={manual.category} onChange={e => setManual(m => ({ ...m, category: e.target.value }))} className="border rounded px-2 py-1" />
+          <input type="text" placeholder="Image or Video URL" value={manual.url} onChange={e => setManual(m => ({ ...m, url: e.target.value }))} className="border rounded px-2 py-1" />
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={manual.visible} onChange={e => setManual(m => ({ ...m, visible: e.target.checked }))} />
+            Visible
+          </label>
+          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded" disabled={uploading}>
+            {uploading ? "Adding…" : "Add Card"}
+          </button>
+        </form>
+      )}
+
       {loading && <div>Loading gallery…</div>}
       {error && <div className="text-red-600 mb-4">{error}</div>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -143,6 +202,7 @@ function GalleryCard({ item, onDelete, onEdit }: { item: any, onDelete: (id: str
   const [type, setType] = React.useState(item.type || "");
   const [category, setCategory] = React.useState(item.category || "");
   const [visible, setVisible] = React.useState(item.visible ?? true);
+  const [url, setUrl] = React.useState(item.url || "");
   return (
     <div className="border rounded-lg p-3 bg-white shadow">
       {item.image_url || item.imageUrl ? (
@@ -184,6 +244,13 @@ function GalleryCard({ item, onDelete, onEdit }: { item: any, onDelete: (id: str
             className="border rounded px-2 py-1 mb-1 w-full"
             placeholder="Category"
           />
+          <input
+            type="text"
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            className="border rounded px-2 py-1 mb-1 w-full"
+            placeholder="Image or Video URL"
+          />
           <label className="flex items-center gap-2 mb-1">
             <input
               type="checkbox"
@@ -196,7 +263,7 @@ function GalleryCard({ item, onDelete, onEdit }: { item: any, onDelete: (id: str
             <button
               className="text-green-700 hover:underline text-xs"
               onClick={() => {
-                onEdit(item.id, { title, caption, description, type, category, visible });
+                onEdit(item.id, { title, caption, description, type, category, visible, url });
                 setEditMode(false);
               }}
             >Save</button>

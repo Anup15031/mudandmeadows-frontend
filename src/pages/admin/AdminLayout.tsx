@@ -10,6 +10,7 @@ export default function AdminLayout() {
           <Link to="/admin/gallery">Gallery</Link>
           <Link to="/admin/bookings">Bookings</Link>
           <Link to="/admin/dining">Dining</Link>
+          <Link to="/admin/cottages">Cottages</Link>
           <Link to="/admin/billing">Billing</Link>
           <Link to="/admin/site">Site Details</Link>
           <Link to="/admin/wellness">Wellness</Link>

@@ -32,9 +32,9 @@ const GalleryPage = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    // Use apiClient to fetch the gallery, but force the endpoint to /api/api/gallery?visible=true
+    // Use apiClient public method to fetch the gallery
     apiClient
-      .request('/api/api/gallery?visible=true')
+      .getGallery({ visibleOnly: true })
       .then((data) => setItems(Array.isArray(data) ? data : []))
       .catch(() => setError("Could not load gallery."))
       .finally(() => setLoading(false));

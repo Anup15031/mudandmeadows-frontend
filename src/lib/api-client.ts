@@ -519,7 +519,7 @@ export class ApiClient {
 
   // Dining (compatibility endpoint reading `menu` collection)
   async getDining() {
-    return this.request('/api/dining');
+    return this.request('/api/dining/all');
   }
 
   async getMenuItem(id: string) {
@@ -614,7 +614,7 @@ export class ApiClient {
   }
 
   async createGalleryItem(data: any) {
-    return this.request('/gallery/', {
+    return this.request('/api/gallery', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -654,6 +654,56 @@ export class ApiClient {
   // Reviews: fetch all reviews
   async getReviews() {
     return this.request('/api/reviews');
+  }
+
+  // Admin Dining Menu CRUD
+  async getAllDiningMenuItems() {
+    return this.request('/api/dining/all');
+  }
+
+  async createDiningMenuItem(data: any) {
+    return this.request('/api/dining', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateDiningMenuItem(id: string, data: any) {
+    return this.request(`/api/dining/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteDiningMenuItem(id: string) {
+    return this.request(`/api/dining/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Admin Cottages CRUD
+  async getAllCottages() {
+    return this.request('/api/cottages/all');
+  }
+
+  async createCottage(data: any) {
+    return this.request('/api/cottages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateCottage(id: string, data: any) {
+    return this.request(`/api/cottages/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteCottage(id: string) {
+    return this.request(`/api/cottages/${id}`, {
+      method: 'DELETE',
+    });
   }
 }
 

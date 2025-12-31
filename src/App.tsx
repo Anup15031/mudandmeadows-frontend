@@ -5,6 +5,7 @@ const AdminGallery = React.lazy(() => import("./pages/admin/AdminGallery"));
 const AdminBookings = React.lazy(() => import("./pages/admin/AdminBookings"));
 const AdminDining = React.lazy(() => import("./pages/admin/AdminDining"));
 const AdminBilling = React.lazy(() => import("./pages/admin/AdminBilling"));
+const AdminCottages = React.lazy(() => import("./pages/admin/AdminCottages"));
 const AdminSite = React.lazy(() => import("./pages/admin/AdminSite"));
 const AdminWellness = React.lazy(() => import("./pages/admin/AdminWellness"));
 const AdminExperiences = React.lazy(() => import("./pages/admin/AdminExperiences"));
@@ -169,6 +170,7 @@ const App = () => {
                     <Route path="gallery" element={<AdminGallery />} />
                     <Route path="bookings" element={<AdminBookings />} />
                     <Route path="dining" element={<AdminDining />} />
+                    <Route path="cottages" element={<AdminCottages />} />
                     <Route path="billing" element={<AdminBilling />} />
                     <Route path="site" element={<AdminSite />} />
                     <Route path="wellness" element={<AdminWellness />} />
